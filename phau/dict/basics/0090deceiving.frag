@@ -1,4 +1,4 @@
-// Author: Patricio Gonzalez Vivo
+// Author: BoS
 // Lesson: few are able to distinguish
 // second: higher and lower light intensity
 
