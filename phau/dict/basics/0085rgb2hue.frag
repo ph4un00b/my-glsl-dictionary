@@ -1,5 +1,7 @@
 // Author BoS
-// Title: step - rgb2hue
+// Title: step - rgb2hue 
+// Lesson: I. better auditory mem than visual?
+// Book: Interaction of Color
 
 #ifdef GL_ES
 precision mediump float;

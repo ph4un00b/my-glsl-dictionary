@@ -48,6 +48,12 @@ html {
   font-style: italic;
   font-weight: 100;
 }
+.glslGallery_lesson {
+  color: #a5ff8c;
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 100;
+}
 .glslGallery_canvas {
   position: absolute;
   top: 0;
