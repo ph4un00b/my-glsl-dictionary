@@ -1,5 +1,5 @@
 // Author BoS
-// Title: sin - rgb2hue
+// Title: mod - rgb2hue
 
 #ifdef GL_ES
 precision mediump float;
@@ -26,13 +26,14 @@ void main(){
     vec3 color = vec3(0.0);
 
     // Use polar coordinates instead of cartesian
-    vec2 toCenter = vec2(0.460,0.470)-st;
+    vec2 toCenter = vec2(0.5)-st;
     float angle = atan(toCenter.y,toCenter.x);
-    float radius = length(toCenter) + abs(sin(u_time * 4.));
+    float radius = length(toCenter)*2.0;
 
     // Map the angle (-PI to PI) to the Hue (from 0 to 1)
     // and the Saturation to the radius
-    color = hsb2rgb(vec3((angle*2.952)+u_time*0.408,radius,0.864));
+    color = mod(hsb2rgb(vec3((angle/TWO_PI)+0.5,radius,1.0)),fract(u_time*0.1));
+    // color = step(0.716,hsb2rgb(vec3((angle/TWO_PI)+0.5,radius,1.0)));
 
     gl_FragColor = vec4(color,1.0);
 }
