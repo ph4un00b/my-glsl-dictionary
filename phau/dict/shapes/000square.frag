@@ -30,7 +30,7 @@ void main(){
     
     // equivalent below
     
-    float pixels = abs(sin(u_time * 0.5));
+    float pixels = abs(sin(u_time * 0.8));
     vec2 borders = step(vec2(pixels),st);
 	float pct = borders.x * borders.y;
 
