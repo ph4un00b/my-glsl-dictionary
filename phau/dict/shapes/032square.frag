@@ -18,6 +18,8 @@ uniform float u_time;
     
 void main(){
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
+         st.x *= u_resolution.x/u_resolution.y;
+
     // st += vec2(-0.5);
     //remapping to 0.0
     vec2 pos = vec2(0.5) - st;
