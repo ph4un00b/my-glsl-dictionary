@@ -27,11 +27,9 @@ void main() {
 
     pct.r = smoothstep(-0.064,1.072, st.x);
     pct.g = sin(st.x + u_time *1.436 ) *0.616* cos(st.x);
-    
     pct.b = pow(st.x,0.236);
-
+    //
     color = mix(colorA, colorB, pct);
-
     // Plot transition lines for each channel
     color = mix(color,vec3(1.0,0.0,0.0),plot(st,pct.r));
     color = mix(color,vec3(0.0,1.0,0.0),plot(st,pct.g));
