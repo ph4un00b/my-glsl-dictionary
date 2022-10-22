@@ -27,20 +27,25 @@ float B = abs(sin(u_time));
 float B1 = (sin(u_time));
 float N = floor(mod(u_time, 10.));
 
+vec2 divideby(in float num, in vec2 c) 
+{
+    c *= num;      // Scale up the space by N
+    // ========== next are equivalent below:
+    c = fract(c); // Wrap around 1.0
+    // or returns the value of x modulo y. 
+    c = mod(c, 1.0);
+    //This is computed as x - y * floor(x/y).
+    c = c - 1.000 * floor(c/1.000);
+    return c;
+}
+
 void main(){
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
      // st.x *= u_resolution.x/u_resolution.y;
     vec3 color = vec3(0.0);
-    st *= N;      // Scale up the space by N
-    // ========== next are equivalent below:
-    st = fract(st); // Wrap around 1.0
-    // or returns the value of x modulo y. 
-    st = mod(st, 1.0);
-    //This is computed as x - y * floor(x/y).
-    st = st - 1.000 * floor(st/1.000);
-    // ========
-    color = vec3(st,0.232);
-    // drawing a circle
+
+    st = divideby(N, st);
+
     color = vec3(circle(st,0.5));
     
     gl_FragColor = vec4(color,1.0);
