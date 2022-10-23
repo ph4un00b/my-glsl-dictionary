@@ -16,19 +16,12 @@ uniform float u_time;
 // else
 //     paint black
     
-void main(){
-    vec2 st = gl_FragCoord.xy/u_resolution.xy;
-         st.x *= u_resolution.x/u_resolution.y;
-
-    //remapping to 0 , 0
+float polygon( in float N, in float size, in vec2 st ) {
+      //remapping to 0 , 0
     vec2 pos = vec2(0.5) - st;
-    float B = abs(sin(u_time));
-    float B1 = (sin(u_time));
-    float N = floor(mod(u_time, 10.));
-    
-	// First we find the angle of each point 
+    // First we find the angle of each point 
     // using the atan function.
-    float angle = B1 + atan(
+    float angle = atan(
         pos.x
         , pos.y
     );
@@ -42,6 +35,8 @@ void main(){
     // @link https://www.computerenhance.com/p/turns-are-better-than-radians
     float b = TWO_PI / N;
     float range = angle;
+    
+    // range = .5;
     // range *= 0.636;
     range /= b;
     range += 0.500;
@@ -66,7 +61,21 @@ void main(){
     range = cos(range) * length(pos.xy);
     
     // Finally a step turns that into a square
-    range = step(0.296, range);
+    range = step( size , range );
+    return range;
+}
+
+void main(){
+    vec2 st = gl_FragCoord.xy/u_resolution.xy;
+        //  st.x *= u_resolution.x/u_resolution.y;
+
+    //remapping to 0 , 0
+    vec2 pos = vec2(0.5) - st;
+    float B = abs(sin(u_time));
+    float B1 = (sin(u_time));
+    float N = floor(mod(u_time, 10.));
+    
+	float range = polygon(N, 0.140, st);
     
     gl_FragColor = vec4(range);
 }
