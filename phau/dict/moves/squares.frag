@@ -1,5 +1,5 @@
 // Author BoS
-// Title: frag - mod - floor
+// Title: square animation
 
 #ifdef GL_ES
 precision mediump float;
@@ -31,6 +31,18 @@ float box(vec2 _st, vec2 _size, float _smoothEdges){
     return uv.x*uv.y;
 }
 
+mat2 rotate2d(float _angle){
+    return mat2(cos(_angle),-sin(_angle),
+                sin(_angle),cos(_angle));
+}
+
+vec2 rotateV2(in float remap, in float rotation, in vec2 st) {
+    st -= vec2( remap );
+    st *= rotate2d( rotation );
+    st += vec2( remap );
+    return st;
+}
+
 float B = abs(sin(u_time));
 float B1 = (sin(u_time));
 float N = floor(mod(u_time, 10.));
@@ -54,7 +66,11 @@ void main(){
 
     st = divideby(N, st);
 
-    color = vec3(circle(st,0.5));
+    float rotate = u_time *N * 0.50;
+    float remap =  0.25 * abs(sin(u_time)) + 0.5;
+    st = rotateV2(remap, rotate, st);
+    
+    color = vec3(box(st,vec2(0.570,0.490), 0.0));
     
     gl_FragColor = vec4(color,1.0);
 }
