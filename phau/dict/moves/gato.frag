@@ -10,12 +10,6 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
-// writing a square
-// if ( (X GREATER THAN 1) AND (Y GREATER THAN 1) )
-//     paint white
-// else
-//     paint black
-
 float box(in vec2 _st, in vec2 _size){
     _size = vec2(0.5) - _size*0.5;
     vec2 uv = smoothstep(_size,
@@ -26,8 +20,6 @@ float box(in vec2 _st, in vec2 _size){
                     vec2(1.0)-_st);
     return uv.x*uv.y;
 }
-
-
 
 float circle(in vec2 _st, in float _radius){
     vec2 l = _st-vec2(0.5);
@@ -90,94 +82,78 @@ void main(){
     vec2 pos = st;
 
 	if (ceil(pos * 3.) == xy(1.,1.)) {
-	color += rgb(1.000,0.124,0.366);
-    // color += vec3(circle(pos * 2. + 0.17,0.284));   
-    color += vec3(circle(st * 1. + 0.324, 0.068)); 
+        color += rgb(1.000,0.124,0.366);
+        color += vec3(circle(st * 1. + 0.324, 0.068)); 
 	}
     if (ceil(pos * 3.) == xy(2.,2.)) {
-	color += rgb(0.000,1.000,0.067);
-	// color += vec3(circle(pos * 2. - 0.5,0.284));     
-    color += vec3(cross(
-        st * 1. 
-        , 0.236)   );   
+        color += rgb(0.000,1.000,0.067);   
+        color += vec3(cross(
+            st * 1. 
+            , 0.236)   );   
 	}
     if (ceil(pos * 3.) == xy(3.,3.)) {
-	color += rgb(0.006,0.174,1.000);
-    // color += vec3(circle(pos * 2. - 1.17,0.284));
-    color += vec3(circle(st * 1. + -0.332, 0.068)); 
+        color += rgb(0.006,0.174,1.000);
+        color += vec3(circle(st * 1. + -0.332, 0.068)); 
 	}
-
     if (ceil(pos * 3.) == xy(1.,2.)) {
-	color += rgb(1.000,0.381,0.988);
-   	// color += vec3(circle(
-    // color += vec3(circle(st * 1. + 0.204, 0.068)); 
-    color += vec3(
-        circle(
-        	vec2(
-                st.x * 1. + 0.340
-                , st.y * 1. + 0.004)
-        	, 0.068)
-        ); 
+        color += rgb(1.000,0.381,0.988);
+        color += vec3(
+            circle(
+                vec2(
+                    st.x * 1. + 0.340
+                    , st.y * 1. + 0.004)
+                , 0.068)
+            ); 
 	}
     if (ceil(pos * 3.) == xy(1.,3.)) {
-	color += rgb(1.000,0.310,0.078);
-        // color += vec3(circle(pos * 2. - 0.496,0.284)); 
-
-    color += vec3(
-        cross(
-        	vec2(
-                st.x * 1. + 0.324 
-                , st.y * 1. + -0.356) 
-        	, 0.228)
-        ); 
+        color += rgb(1.000,0.310,0.078);
+        color += vec3(
+            cross(
+                vec2(
+                    st.x * 1. + 0.324 
+                    , st.y * 1. + -0.356) 
+                , 0.228)
+            ); 
 	}
-
     if (ceil(pos * 3.) == xy(2.,1.)) {
-	color += rgb(0.059,0.595,0.121);
-    color += vec3(circle(vec2(
-        st.x * 1. + -0.004
-    	,st.y * 1. + 0.324
-    ), 0.068)); 
+        color += rgb(0.059,0.595,0.121);
+        color += vec3(circle(vec2(
+            st.x * 1. + -0.004
+            ,st.y * 1. + 0.324
+        ), 0.068)); 
 	}
     if (ceil(pos * 3.) == xy(2.,3.)) {
-	color += rgb(0.875,0.990,0.023);
-    color += vec3(circle(vec2(
-        st.x * 1. + 0.004
-    	,st.y * 1. + -0.340
-    ), 0.068)); 
+        color += rgb(0.875,0.990,0.023);
+        color += vec3(circle(vec2(
+            st.x * 1. + 0.004
+            ,st.y * 1. + -0.340
+        ), 0.068)); 
 	}
-
     if (ceil(pos * 3.) == xy(3.,1.)) {
-	color += rgb(0.706,0.008,1.000);
-    color += vec3(cross(vec2(
-        st.x * 1. + -0.324
-    	,st.y * 1. + 0.324
-    ), 0.212)); 
+        color += rgb(0.706,0.008,1.000);
+        color += vec3(cross(vec2(
+            st.x * 1. + -0.324
+            ,st.y * 1. + 0.324
+        ), 0.212)); 
 	}
     if (ceil(pos * 3.) == xy(3.,2.)) {
-	color += rgb(0.016,0.689,1.000);
-    color += vec3(circle(vec2(
-        st.x * 1. + -0.348
-    	,st.y * 1. + -0.004
-    ), 0.068));  
+        color += rgb(0.016,0.689,1.000);
+        color += vec3(circle(vec2(
+            st.x * 1. + -0.348
+            ,st.y * 1. + -0.004
+        ), 0.068));  
 	}
         
     st = divideby(3., st);
     
     // color += vec3(circle(st,0.5));
-    
     if (ceil(st * 3.) == /** 1,1 in 1 */ xy(1.,1.)) {
          // color = vec3(circle(st,0.956));
 		// color = rgb(1.000,0.494,0.015);
-        // color = vec3(cross(st,0.372));
-        
+        // color = vec3(cross(st,0.372));    
 	}
     
-    
-
     // color += vec3(st,0.508);
-
-
     // color += vec3(circle(st,0.5));
     // color = vec3(ceil(st),0.);
     
