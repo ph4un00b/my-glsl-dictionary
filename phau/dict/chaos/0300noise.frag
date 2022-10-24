@@ -177,11 +177,15 @@ float B(in vec2 st) {
     return (polygon(3. + N, size, st));
 }
 
+float S = abs(sin(u_time));
+float S1 = (sin(u_time));
+float N = floor(mod(u_time, 10.));
+
 float ran(in vec2 st, in float lever) {
     float k = 43758.5453123;
     float y;
     // vec2 vran = vec2(12.9898,78.233);
-    vec2 vran = vec2(12.9898,78.233);
+    vec2 vran = vec2(1. + N, 1. + N * 10.);
     float x = dot(st.xy, vran);
     // middle concentration
     // >>> rand(x);
@@ -199,9 +203,7 @@ float ran(in vec2 st, in float lever) {
     return y;
 }
 
-float S = abs(sin(u_time));
-float S1 = (sin(u_time));
-float N = floor(mod(u_time, 10.));
+
 
 void main(){
 	vec2 st = gl_FragCoord.xy/u_resolution.xy;
