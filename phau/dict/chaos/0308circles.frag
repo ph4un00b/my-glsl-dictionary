@@ -1,6 +1,6 @@
 // Author: phau
-// Title: refactors
-// lesson: if-else -> mix!
+// Title: base
+// lesson: base!
 
 #ifdef GL_ES
 precision mediump float;
