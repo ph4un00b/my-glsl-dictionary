@@ -121,18 +121,18 @@ void main(void){
     float angle = atan(st.y, st.x);
     
     // radius = 0.832; // all lines go to the center
-    angle = S;
+    angle = 1.;
     vec2 p = vec2(radius);
     p = vec2(
         radius * cos(angle),
         radius * sin(angle)
     );
-    //   color.rgb= PURPLE + AZUR;
+     
+    // color.rgb= PURPLE + AZUR;
 
-    color.r = abs(sin(cos(u_time + 3. * st.y) * 3. * st.x));
-    color.g = abs(cos(sin(u_time + 3. * st.x) * 3. * st.y));
+    color.r = abs(sin(cos(u_time + 3. * p.y) * 3. * p.x));
+    color.g = abs(cos(sin(u_time + 3. * p.x) * 3. * p.y));
     color.b = fract(u_time);
-	// color = texture2D(u_tex0, p);
 
   gl_FragColor = color;
 }
