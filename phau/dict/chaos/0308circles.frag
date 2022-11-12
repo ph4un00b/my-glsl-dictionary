@@ -1,6 +1,6 @@
 // Author: phau
-// Title: base
-// lesson: base!
+// Title: circles
+// lesson: noisy
 
 #ifdef GL_ES
 precision mediump float;
@@ -92,6 +92,28 @@ float K = 43758.5453123;
 vec2 VRAN = vec2(12.9898,78.233);
 uniform sampler2D u_tex0;
 
+float ran(in vec2 st, in float lever) {
+    float k = 43758.5453123;
+    float y;
+    // vec2 vran = vec2(12.9898,78.233);
+    vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // middle concentration
+    // >>> rand(x);
+    y = fract( sin(x) * k);
+    // bottom concentration
+    // >>> rand(x) * rand(x );
+    y = fract( sin(x) * k) * fract( sin(x) * k);
+    // upper concentration
+    // >>> abs(sqrt(-0.384 + rand(x)));
+    y = sqrt(fract( sin(x) * k));
+    // hard bottom concentration with lever
+    /** lever: [0 (uppper), 5 (bottom)] */
+    y = pow(fract( sin(x) * k), lever);
+    /** @link https://pixelero.wordpress.com/2008/04/24/various-functions-and-various-distributions-with-mathrandom/ */
+    return y;
+}
+
 vec2 remap(vec2 st, float N) {
     st =  N * st;
     st = st - (N / 2.0);
@@ -100,6 +122,10 @@ vec2 remap(vec2 st, float N) {
 
 float circleA(vec2 st, float delta) {
     return length(st) + delta;
+}
+
+float noise(float x) {
+    return 0.0;
 }
 
 void main(void){
@@ -112,10 +138,12 @@ void main(void){
     // st.x += -0.328;
     // remap
     // st *= 3.;
-    float times = 2.;
+    float times = N;
     st =  remap(st, times);
-  	vec2 ipos = ceil(st);
-  	vec2 fpos = fract(st);
+  	// vec2 ipos = ceil(st);
+  	// vec2 fpos = fract(st);
+
+
     
     float radius = circleA(st, S * 0.496);
     float angle = atan(st.y, st.x);
@@ -123,16 +151,28 @@ void main(void){
     // radius = 0.832; // all lines go to the center
     angle = 1.;
     vec2 p = vec2(radius);
+    // vec2 p = vec2(ran(vec2(radius), 5.056));
     p = vec2(
         radius * cos(angle),
+        // ran(vec2(radius * cos(angle)), 0.080),
         radius * sin(angle)
     );
      
-    // color.rgb= PURPLE + AZUR;
+    color.rgb= PURPLE + AZUR;
 
     color.r = abs(sin(cos(u_time + 3. * p.y) * 3. * p.x));
     color.g = abs(cos(sin(u_time + 3. * p.x) * 3. * p.y));
     color.b = fract(u_time);
+    
+    vec2 i = floor(st);  // integer
+	vec2 f = fract(st);  // fraction
+	float y = ran(i, 0.264); 
+	// y = mix(rand(i), rand(i + 1.0), f);
+    y = mix(ran(i, 0.392), ran(i + 1.0, 0.840), f.x);
+	// y = mix(rand(i), rand(i + 1.0), smoothstep(0.,1.,f));
+    y = mix(ran(i, 0.280), ran(i + 1.0, 0.624), smoothstep(0.,1.,f.x));
+    
+    color += vec4(vec3(y), 1.000);
 
   gl_FragColor = color;
 }
