@@ -1,6 +1,6 @@
 // Author: phau
-// Title: basics
-// lesson: rgb offsets!
+// Title: refactors
+// lesson: if-else -> mix!
 
 #ifdef GL_ES
 precision mediump float;
@@ -92,14 +92,40 @@ float K = 43758.5453123;
 vec2 VRAN = vec2(12.9898,78.233);
 uniform sampler2D u_tex0;
 
+float ran(in vec2 st, in float lever) {
+    float k = 43758.5453123;
+    float y;
+    // vec2 vran = vec2(12.9898,78.233);
+    vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // middle concentration
+    // >>> rand(x);
+    y = fract( sin(x) * k);
+    // bottom concentration
+    // >>> rand(x) * rand(x );
+    y = fract( sin(x) * k) * fract( sin(x) * k);
+    // upper concentration
+    // >>> abs(sqrt(-0.384 + rand(x)));
+    y = sqrt(fract( sin(x) * k));
+    // hard bottom concentration with lever
+    /** lever: [0 (uppper), 5 (bottom)] */
+    y = pow(fract( sin(x) * k), lever);
+    /** @link https://pixelero.wordpress.com/2008/04/24/various-functions-and-various-distributions-with-mathrandom/ */
+    return y;
+}
+
 vec2 offset_in_px(in vec2 st, in float offset) {
     vec2 pixel = 1. / u_resolution;
-    return st + (pixel * offset);
+    // random offset
+    float ran = ran(st, -0.416);
+    return st + (pixel * offset * ran);
 }
 
 float stripes(in vec2 st, in float num) {
     return fract((st.x + st.y)  * num + u_time);
 }
+
+
 
 void main(void){
     vec4 color=vec4(0.,0.,0.,1.);
@@ -110,7 +136,7 @@ void main(void){
     vec4 c1 = vec4(BLACK, 1.);
     
     float T = (mod(floor(u_time / 2.15), 9.));
-    // T = 1.;
+    // T = 2.;
 
     float off = 0.;
     float num = 4.328;
@@ -221,7 +247,7 @@ void main(void){
     num = 4.328;
  	test = step(0.500, stripes(st, num));
  	color += vec4(test) * when_eq(vec4(T), vec4(8.));
-    // from Vivo's tips
+    // from Vivo's tips with some random
     off = 3.200;
     
     test = step(0.5, stripes(offset_in_px(st, off), num));
