@@ -1,6 +1,6 @@
 // Author: phau
 // Title: animation
-// lesson: noise1d!
+// lesson: noises 1d!
 
 #ifdef GL_ES
 precision mediump float;
