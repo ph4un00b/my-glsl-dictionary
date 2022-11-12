@@ -92,25 +92,52 @@ float K = 43758.5453123;
 vec2 VRAN = vec2(12.9898,78.233);
 uniform sampler2D u_tex0;
 
-float ran(in vec2 st, in float lever) {
+float ran2l(in vec2 st, in float lever) {
     float k = 43758.5453123;
     float y;
-    // vec2 vran = vec2(12.9898,78.233);
-    vec2 vran = vec2(1. + N, 1. + N * 10.);
+    vec2 vran = vec2(12.9898,78.233);
+    // vec2 vran = vec2(1. + N, 1. + N * 10.);
     float x = dot(st.xy, vran);
-    // middle concentration
-    // >>> rand(x);
-    y = fract( sin(x) * k);
-    // bottom concentration
-    // >>> rand(x) * rand(x );
-    y = fract( sin(x) * k) * fract( sin(x) * k);
-    // upper concentration
-    // >>> abs(sqrt(-0.384 + rand(x)));
-    y = sqrt(fract( sin(x) * k));
     // hard bottom concentration with lever
     /** lever: [0 (uppper), 5 (bottom)] */
     y = pow(fract( sin(x) * k), lever);
     /** @link https://pixelero.wordpress.com/2008/04/24/various-functions-and-various-distributions-with-mathrandom/ */
+    return y;
+}
+
+float ran2m(in vec2 st) {
+    float k = 43758.5453123;
+    float y;
+    vec2 vran = vec2(12.9898,78.233);
+    // vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // middle concentration
+    // >>> rand(x);
+    y = fract( sin(x) * k);
+    return y;
+}
+
+float ran2b(in vec2 st) {
+    float k = 43758.5453123;
+    float y;
+    vec2 vran = vec2(12.9898,78.233);
+    // vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // bottom concentration
+    // >>> rand(x) * rand(x );
+    y = fract( sin(x) * k) * fract( sin(x) * k);
+    return y;
+}
+
+float ran2u(in vec2 st) {
+    float k = 43758.5453123;
+    float y;
+    vec2 vran = vec2(12.9898,78.233);
+    // vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // upper concentration
+    // >>> abs(sqrt(-0.384 + rand(x)));
+    y = sqrt(fract( sin(x) * k));
     return y;
 }
 
@@ -124,11 +151,55 @@ float circleA(vec2 st, float delta) {
     return length(st) + delta;
 }
 
-float noise(float x) {
-    return 0.0;
-}
 
 float ran1(float x) {
+    float y;
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    // return fract(sin(x)* 1.0);
+    return fract(sin(x)* k);
+    // middle
+    // return fract( sin(x) * k);
+    // botom
+    // return fract( sin(x) * k) * fract( sin(x) * k);
+    // upper
+    // return sqrt(fract( sin(x) * k));
+}
+
+float ran1l(in float x, in float lever) {
+    float y;
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    return pow(fract( sin(x) * k), lever);
+}
+
+float noise1(float x) {
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    // y = mix(rand(i), rand(i + 1.0), f);
+    return mix(ran1(i), ran1(i + 1.), f);
+}
+
+float noise1c(float x) {
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    float u = f * f * (3.0 - 2.0 * f ); // custom cubic curve
+    return mix(ran1(i), ran1(i + 1.), u);
+}
+
+float noise1s(float x) {
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    // y = mix(rand(i), rand(i + 1.0), smoothstep(0.,1.,f));
+    return mix(ran1(i), ran1(i + 1.0), smoothstep(0.,1.,f));
+}
+
+float noise1x(float x) {
     float y;
     float k = 43758.5453123;
     float i = floor(x);  // integer
@@ -139,12 +210,13 @@ float ran1(float x) {
     // y = mix(rand(i), rand(i + 1.0), f);
     // return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), f);
     
-    float u = f * f * (3.0 - 2.0 * f ); // custom cubic curve
+    // float u = f * f * (3.0 - 2.0 * f ); // custom cubic curve
     return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), f);
     
     // y = mix(rand(i), rand(i + 1.0), smoothstep(0.,1.,f));
     // return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), smoothstep(0.,1.,f));
 }
+
 
 void main(void){
     vec4 color=vec4(0.,0.,0.,1.);
@@ -166,7 +238,8 @@ void main(void){
     float angle = atan(st.y, st.x);
     
     // radius = 0.832; // all lines go to the center
-    angle = ran1(u_time);
+    angle = noise1x(u_time);
+    
     vec2 p = vec2(radius);
     // vec2 p = vec2(ran(vec2(radius), 5.056));
     p = vec2(
@@ -178,9 +251,11 @@ void main(void){
     // color.rgb = PURPLE + AZUR;
 
     float test = abs(sin(cos(2. * p.x) * 6. * p.y));
-    color.r = step(ran1(0.428 + u_time), (test));
+    color.r = step(noise1s(0.428 + u_time), (test));
+    
     test = abs(cos(sin(3. * p.x) * 3. * p.y));
-    color.g = step(ran1(0.428 + u_time), (test));
+    color.g = step(noise1s(0.428 + u_time), (test));
+    
     color.b = fract((u_time));
     
     // color += vec4(vec3(ran1(st.x)), 1.000);
