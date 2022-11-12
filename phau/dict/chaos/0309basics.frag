@@ -136,7 +136,7 @@ void main(void){
     vec4 c1 = vec4(BLACK, 1.);
     
     float T = (mod(floor(u_time / 2.15), 9.));
-    // T = 2.;
+    // T = 6.;
 
     float off = 0.;
     float num = 4.328;
