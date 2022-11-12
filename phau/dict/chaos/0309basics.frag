@@ -90,6 +90,7 @@ float S1 = (sin(u_time));
 float N = floor(mod(u_time, 10.));
 float K = 43758.5453123;
 vec2 VRAN = vec2(12.9898,78.233);
+
 uniform sampler2D u_tex0;
 
 float ran(in vec2 st, in float lever) {
@@ -114,18 +115,157 @@ float ran(in vec2 st, in float lever) {
     return y;
 }
 
-vec2 offset_in_px(in vec2 st, in float offset) {
-    vec2 pixel = 1. / u_resolution;
-    // random offset
-    float ran = ran(st, -0.416);
-    return st + (pixel * offset * ran);
-}
+
 
 float stripes(in vec2 st, in float num) {
     return fract((st.x + st.y)  * num + u_time);
 }
 
+float ran2l(in vec2 st, in float lever) {
+    float k = 43758.5453123;
+    float y;
+    vec2 vran = vec2(12.9898,78.233);
+    // vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // hard bottom concentration with lever
+    /** lever: [0 (uppper), 5 (bottom)] */
+    y = pow(fract( sin(x) * k), lever);
+    /** @link https://pixelero.wordpress.com/2008/04/24/various-functions-and-various-distributions-with-mathrandom/ */
+    return y;
+}
 
+float ran2m(in vec2 st) {
+    float k = 43758.5453123;
+    float y;
+    vec2 vran = vec2(12.9898,78.233);
+    // vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // middle concentration
+    // >>> rand(x);
+    y = fract( sin(x) * k);
+    return y;
+}
+
+float ran2b(in vec2 st) {
+    float k = 43758.5453123;
+    float y;
+    vec2 vran = vec2(12.9898,78.233);
+    // vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // bottom concentration
+    // >>> rand(x) * rand(x );
+    y = fract( sin(x) * k) * fract( sin(x) * k);
+    return y;
+}
+
+float ran2u(in vec2 st) {
+    float k = 43758.5453123;
+    float y;
+    vec2 vran = vec2(12.9898,78.233);
+    // vec2 vran = vec2(1. + N, 1. + N * 10.);
+    float x = dot(st.xy, vran);
+    // upper concentration
+    // >>> abs(sqrt(-0.384 + rand(x)));
+    y = sqrt(fract( sin(x) * k));
+    return y;
+}
+
+float ran1(float x) {
+    float y;
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    // return fract(sin(x)* 1.0);
+    return fract(sin(x)* k);
+    // middle
+    // return fract( sin(x) * k);
+    // botom
+    // return fract( sin(x) * k) * fract( sin(x) * k);
+    // upper
+    // return sqrt(fract( sin(x) * k));
+}
+
+float ran1l(in float x, in float lever) {
+    float y;
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    return pow(fract( sin(x) * k), lever);
+}
+
+float noise1(float x) {
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    // y = mix(rand(i), rand(i + 1.0), f);
+    return mix(ran1(i), ran1(i + 1.), f);
+}
+
+float noise1c(float x) {
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    float u = f * f * (3.0 - 2.0 * f ); // custom cubic curve
+    return mix(ran1(i), ran1(i + 1.), u);
+}
+
+float noise2c(vec2 x) {
+    vec2 i = floor(x);  // integer
+	vec2 f = fract(x);  // fraction
+    vec2 u = f * f * (3.0 - 2.0 * f ); // custom cubic curve
+    return mix(
+        mix( ran2m(i), ran2m(i + vec2(1.0, 0.0)), u.x ),
+        mix( ran2m(i + vec2(0.0, 1.0)), ran2m(i + vec2(1.0, 1.0)), u.x),
+        u.y
+    );
+}
+
+float noise1s(float x) {
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+    // y = mix(rand(i), rand(i + 1.0), smoothstep(0.,1.,f));
+    return mix(ran1(i), ran1(i + 1.0), smoothstep(0.,1.,f));
+}
+
+float noise1x(float x) {
+    float y;
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+
+    // return fract( sin(i) * k);
+    
+    // y = mix(rand(i), rand(i + 1.0), f);
+    // return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), f);
+    
+    // float u = f * f * (3.0 - 2.0 * f ); // custom cubic curve
+    return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), f);
+    
+    // y = mix(rand(i), rand(i + 1.0), smoothstep(0.,1.,f));
+    // return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), smoothstep(0.,1.,f));
+}
+
+float layers(vec2 st) {
+    float test = 0.5 * noise2c(st * (7.0) + u_time);
+    // test += ran2l(st * 8. + vec2(u_time, 0.0), 0.440);
+    // layer2
+    test += 0.25 * noise2c(st * 14.376 + vec2(u_time, 0.0));
+    // layer3
+    test += 0.125 * noise2c(st * 28.+ vec2(u_time, 0.0));
+    // layer4
+    test += 0.0625 * noise2c(st * 56.+ vec2(u_time, 0.0));
+    // layer5
+    test += 0.0625 * noise2c(st * 56. * 2.+ vec2(u_time, 0.0));
+    return test;
+}
+
+vec2 offset_in_px(in vec2 st, in float offset) {
+    vec2 pixel = 1. / u_resolution;
+    // random offset
+    float ran = noise2c(st + u_time);
+    return st + (pixel * offset * ran);
+}
 
 void main(void){
     vec4 color=vec4(0.,0.,0.,1.);
@@ -135,8 +275,8 @@ void main(void){
     vec4 c2 = vec4(WHITE, 1.);
     vec4 c1 = vec4(BLACK, 1.);
     
-    float T = (mod(floor(u_time / 2.15), 9.));
-    // T = 6.;
+    float T = (mod(floor(u_time / 1.734), 9.));
+    // T = 8.;
 
     float off = 0.;
     float num = 4.328;
@@ -213,15 +353,20 @@ void main(void){
     color = T == 5. ? color : tmp;
     // smoothstep -> easing
     tmp = color;
-    test =  smoothstep(0.0, S, st.x);
+    // test =  smoothstep(0.0, 2.0, st.x + ran2l(st, 3.264));
+    // test =  smoothstep(0.0, 2.064, st.x + noise2c(st + u_time));
+    // simulating fbm -> output [0,1]
+    test = smoothstep(0.0, 0.744, layers(st));
     color += mix(c1,c2, test) * when_eq(vec4(T), vec4(6.));
     
-    off = 6.032;
+    off = 6.032;	
     
-    test = smoothstep(0.0, S, offset_in_px(st, off).x);
+    // test = smoothstep(0.0, S, offset_in_px(st, off).x);
+    test = smoothstep(0.0, 0.744, layers(offset_in_px(st, off)));
     color.r = (vec4(test) * when_eq(vec4(T), vec4(6.))).x;
     
-    test = smoothstep(0.0, S, offset_in_px(st, - off).x);
+    // test = smoothstep(0.0, S, offset_in_px(st, - off).x);
+   	test = smoothstep(0.0, 0.744, layers(offset_in_px(st, - off)));
     color.b = (vec4(test) * when_eq(vec4(T), vec4(6.))).x;
     
     color = T == 6. ? color : tmp;
