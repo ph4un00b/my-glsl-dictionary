@@ -1,8 +1,6 @@
 // Author: phau
-// Title: noisses
-#ifdef GL_ES
+// Title: noises
 precision mediump float;
-#endif
             
       uniform vec3 u_camera;
       uniform vec3 u_light;
@@ -18,7 +16,7 @@ precision mediump float;
       varying vec2 v_texcoord; 
       #endif
       
-      
+      #define PLATFORM_WEBGL
       /* Color palette */
       #define BLACK vec3(0.,0.,0.)
       #define WHITE vec3(1.,1.,1.)
@@ -1211,20 +1209,6 @@ vec4 noised (in vec3 pos) {
         return test;
     }
 
-// #include "lygia/generative/voronoise.glsl"
-
-//       float layers6(vec2 st) {
-//          float test = 0.2 * voronoise(st * 4.5 + u_time * 0.15, 1., 1.);
-//           // layer2
-//           test += 0.25 * voronoise(st * 9. + vec2(u_time, 0.0), 1., 1.);
-//         // // // //   // layer3
-//           test += 0.125 * voronoise(st * 18. + vec2(u_time, 0.0), 1., 1.);
-//         // // // //   // layer4
-//           test += 0.0625 * voronoise(st * 36. + vec2(u_time, 0.0), 1., 1.);
-//         // // // //   // layer5
-//           test += 0.0625 * voronoise(st * 72. + vec2(u_time, 0.0), 1., 1.);
-//         return test;
-//     }
 
 
 
@@ -1323,6 +1307,135 @@ vec4 random4(vec4 p4) {
 
 
 #endif
+
+
+
+#ifndef QTR_PI
+#define QTR_PI 0.78539816339
+#endif
+#ifndef HALF_PI
+#define HALF_PI 1.5707963267948966192313216916398
+#endif
+#ifndef PI
+#define PI 3.1415926535897932384626433832795
+#endif
+#ifndef TWO_PI
+#define TWO_PI 6.2831853071795864769252867665590
+#endif
+#ifndef TAU
+#define TAU 6.2831853071795864769252867665590
+#endif
+#ifndef ONE_OVER_PI
+#define ONE_OVER_PI 0.31830988618
+#endif
+#ifndef SQRT_HALF_PI
+#define SQRT_HALF_PI 1.25331413732
+#endif
+#ifndef PHI
+#define PHI 1.618033988749894848204586834
+#endif
+#ifndef EPSILON
+#define EPSILON 0.0000001
+#endif
+#ifndef GOLDEN_RATIO
+#define GOLDEN_RATIO 1.6180339887
+#endif
+#ifndef GOLDEN_RATIO_CONJUGATE 
+#define GOLDEN_RATIO_CONJUGATE 0.61803398875
+#endif
+#ifndef GOLDEN_ANGLE // (3.-sqrt(5.0))*PI radians
+#define GOLDEN_ANGLE 2.39996323
+#endif
+
+
+
+/*
+original_author: Inigo Quiles
+description: cell noise https://iquilezles.org/articles/voronoise/
+use: <float> voronoi(<vec3|vec2> pos, float voronoi, float _smoothness);
+options:
+    VORONOI_RANDOM_FNC: 
+*/
+
+#ifndef VORONOI_RANDOM_FNC 
+#define VORONOI_RANDOM_FNC(XYZ) random3(XYZ) 
+#endif
+
+#ifndef FNC_VORONOISE
+#define FNC_VORONOISE
+float voronoise( in vec2 p, in float u, float v) {
+    float k = 1.0+63.0*pow(1.0-v,6.0);
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    
+    vec2 a = vec2(0.0, 0.0);
+    
+    #if defined(PLATFORM_WEBGL)
+    for ( float y = -2.0; y <= 2.0; y++ )
+    for ( float x = -2.0; x <= 2.0; x++ ) {
+        vec2 g = vec2(x, y);
+
+    #else
+    vec2 g = vec2(-2.0);
+    for ( g.y = -2.0; g.y <= 2.0; g.y++ )
+    for ( g.x = -2.0; g.x <= 2.0; g.x++ ) {
+        
+    #endif
+        vec3  o = VORONOI_RANDOM_FNC(i + g) * vec3(u, u, 1.0);
+        vec2  d = g - f + o.xy;
+        float w = pow(1.0-smoothstep(0.0,1.414, length(d)), k );
+        a += vec2(o.z*w,w);
+    }
+        
+    return a.x/a.y;
+}
+
+float voronoise(vec3 p, float u, float v)  {
+    float k = 1.0+63.0*pow(1.0-v,6.0);
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+
+    float s = 1.0 + 31.0 * v;
+    vec2 a = vec2(0.0, 0.0);
+
+    #if defined(PLATFORM_WEBGL)
+    for ( float z = -2.0; z <= 2.0; z++ )
+    for ( float y = -2.0; y <= 2.0; y++ )
+    for ( float x = -2.0; x <= 2.0; x++ ) {
+        vec3 g = vec3(x, y, z);
+
+    #else
+
+    vec3 g = vec3(-2.0);
+    for (g.z = -2.0; g.z <= 2.0; g.z++ )
+    for (g.y = -2.0; g.y <= 2.0; g.y++ )
+    for (g.x = -2.0; g.x <= 2.0; g.x++ ) {
+    #endif
+
+        vec3 o = VORONOI_RANDOM_FNC(i + g) * vec3(u, u, 1.);
+        vec3 d = g - f + o + 0.5;
+        float w = pow(1.0 - smoothstep(0.0, 1.414, length(d)), k);
+        a += vec2(o.z*w, w);
+     }
+     return a.x / a.y;
+}
+
+#endif
+
+
+
+      float layers6(vec2 st) {
+         float test = 0.2 * voronoise(st * 4.5 + u_time * 0.15, 1., 1.);
+          // layer2
+          test += 0.25 * voronoise(st * 9. + vec2(u_time, 0.0), 1., 1.);
+        // // // //   // layer3
+          test += 0.125 * voronoise(st * 18. + vec2(u_time, 0.0), 1., 1.);
+        // // // //   // layer4
+          test += 0.0625 * voronoise(st * 36. + vec2(u_time, 0.0), 1., 1.);
+        // // // //   // layer5
+          test += 0.0625 * voronoise(st * 72. + vec2(u_time, 0.0), 1., 1.);
+        return test;
+    }
 
 
 
@@ -1443,8 +1556,8 @@ void main(void){
     cell = paint(LIME, ORANGE);
 
         // lever = 0.512;
-    // test = smoothstep(0.0, lever, layers6(st));
-    // cell = mix(c1,c2, test);
+    test = smoothstep(0.0, lever, layers6(st));
+    cell = mix(c1,c2, test);
     color = i.x == 1. && i.y == 2. ? cell : color;
 
     cell = paint(AZUR, BLUE);
