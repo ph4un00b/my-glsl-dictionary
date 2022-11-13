@@ -1427,44 +1427,50 @@ void main(void){
     color = i.x == 1. && i.y == 1. ? cell : color;
     cell = paint(AZUR, ACQUA);
 
-    // lever = 0.512;
-    test = smoothstep(0.0, lever, layers1(st));
+        // lever = 0.512;
+    test = smoothstep(0.0, lever, layers4(st));
     cell = mix(c1,c2, test);
+
     color = i.x == 2. && i.y == 1. ? cell : color;
 
     cell = paint(AZUR, PURPLE);
-    // lever = 0.512;
-    test = smoothstep(0.0, lever, layers2(st));
+
+        // lever = 0.512;
+    test = smoothstep(0.0, lever, layers7(st));
     cell = mix(c1,c2, test);
     color = i.x == 3. && i.y == 1. ? cell : color;
 
     cell = paint(LIME, ORANGE);
-    // lever = 0.512;
-    test = smoothstep(0.0, lever, layers3(st));
-    cell = mix(c1,c2, test);
+
+        // lever = 0.512;
+    // test = smoothstep(0.0, lever, layers6(st));
+    // cell = mix(c1,c2, test);
     color = i.x == 1. && i.y == 2. ? cell : color;
 
     cell = paint(AZUR, BLUE);
-    // lever = 0.512;
-    test = smoothstep(0.0, lever, layers4(st));
+        // lever = 0.512;
+    test = smoothstep(0.0, lever, layers5(st));
     cell = mix(c1,c2, test);
+
     color = i.x == 2. && i.y == 2. ? cell : color;
 
     cell = paint(LIME, ACQUA);
-    // lever = 0.512;
-    test = smoothstep(0.0, lever, layers5(st));
+
+        // lever = 0.512;
+    test = smoothstep(0.0, lever, layers3(st));
     cell = mix(c1,c2, test);
     color = i.x == 3. && i.y == 2. ? cell : color;
 
     cell = paint(LIME, RED);
     // lever = 0.512;
-    // test = smoothstep(0.0, lever, layers6(st));
-    // cell = mix(c1,c2, test);
+    test = smoothstep(0.0, lever, layers2(st));
+    cell = mix(c1,c2, test);
     color = i.x == 1. && i.y == 3. ? cell : color;
 
     cell = paint(LIME, CYAN);
-    // lever = 0.512;
-    test = smoothstep(0.0, lever, layers7(st));
+
+        // lever = 0.512;
+    test = smoothstep(0.0, lever, layers1(st));
     cell = mix(c1,c2, test);
     color = i.x == 2. && i.y == 3. ? cell : color;
     cell = paint(RED, ACQUA );
