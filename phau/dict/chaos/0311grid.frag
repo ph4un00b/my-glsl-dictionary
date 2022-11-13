@@ -76,7 +76,8 @@ void main() {
  	vec3 c1 = BLACK;
     vec3 c2 = WHITE;
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
-    st.x *= u_resolution.x/u_resolution.y;
+    // line below will stretch the grid
+    // st.x *= u_resolution.x/u_resolution.y;
 	
     st = st * 3.;
 
