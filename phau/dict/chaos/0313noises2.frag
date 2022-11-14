@@ -668,9 +668,12 @@ float fbm1(vec2 x) {
 
 float patterns(float x) {
     float test = x;
-    test *= 3.896;
-    test += u_time;
+    test *= 2.672;
+    test += (u_time * 0.412);
 	test = fract(test);
+    // test = step(0.180, test);
+    // test = smoothstep(0.0, 0.124, test);
+    test = smoothstep(0.0, 0.124, test) - smoothstep(0.050, 0.172, test);
     return test;
 }
 void main(void){
@@ -679,14 +682,14 @@ void main(void){
   vec2 px=1./u_resolution;
   vec2 st=gl_FragCoord.xy*px;
 
-  vec4 c2 = vec4(WHITE, 1.);
-  vec4 c1 = vec4(BLACK, 1.);
+  vec4 c2 = vec4(AZUR, 1.);
+  vec4 c1 = vec4(WHITE, 1.);
 
   color.r = abs(sin(u_time));
   color.g = fract(st.x);
   color.b = fract(st.y);
 
-  vec2 p = st * 3.0;
+  vec2 p = st * 3.008;
   vec3 zell = vec3(0.);
 	
   vec2 i = ceil(p);  // integer
@@ -700,11 +703,12 @@ void main(void){
 
   vec2 off = vec2(0.,1.);
   float test = 0.0;
-  p.x = p.x + u_time;
+  p.x = p.x + u_time * 0.2;
+  p *= 1.232; /** zoom */
     
   zell = paint(AZUR, VIOLET);
   test = patterns( value_noise_linear(p) );
-  zell = vec3(test);
+  zell = vec3(mix(c1, c2,test));
     color = i.x == 1. && i.y == 1. ? zell : color;
   zell = paint(AZUR, ACQUA);
   test = patterns( value_noise(p) );
@@ -732,7 +736,7 @@ void main(void){
     color = i.x == 1. && i.y == 3. ? zell : color;
   zell = paint(AZUR, VIOLET );
   test = patterns( fbm1(p) );
-  zell = vec3(test);
+  zell = vec3(mix(c1, c2,test));
     color = i.x == 2. && i.y == 3. ? zell : color;
     zell = LIME + AZUR;
     color = i.x == 3. && i.y == 3. ? zell : color;
