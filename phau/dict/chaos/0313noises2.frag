@@ -1,3 +1,7 @@
+// Author: phau
+// Title: noises2!
+// lesson:  sky
+
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -641,6 +645,24 @@ float rand(vec2 n) {
 	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
 }
 
+float noise1x(float x) {
+    float y;
+    float k = 43758.5453123;
+    float i = floor(x);  // integer
+	float f = fract(x);  // fraction
+
+    // return fract( sin(i) * k);
+    
+    // y = mix(rand(i), rand(i + 1.0), f);
+    // return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), f);
+    
+    // float u = f * f * (3.0 - 2.0 * f ); // custom cubic curve
+    return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), f);
+    
+    // y = mix(rand(i), rand(i + 1.0), smoothstep(0.,1.,f));
+    // return mix(fract( sin(i) * k), fract( sin(i + 1.0) * k), smoothstep(0.,1.,f));
+}
+
 float noise(vec2 p){
 	vec2 ip = floor(p);
 	vec2 u = fract(p);
@@ -670,7 +692,9 @@ float patterns(float x, float nois) {
     float test = x;
     test *= 2.672;
     test += nois;
-    test += (u_time * 0.112);
+    test += (u_time * (0.112) );
+    // test += (u_time * noise1x(0.112) );
+    // test += noise1x(u_time * (0.112) );
 	test = fract(test);
     // test = step(0.180, test);
     // test = smoothstep(0.0, 0.124, test);
@@ -718,8 +742,9 @@ void main(void){
   float test = 0.0;
   //p.x = p.x + u_time * 0.2; /* linear movement */
   // p = p + vec2(u_time * 0.1, u_time * 0.1); /* linear movement */
-  p = p * rotation2d(u_time * 0.005); 
-  p *= 1.232; /** zoom */
+  // p = p * rotation2d(u_time * 0.005); 
+  p = p * rotation2d(noise1x(u_time * 0.015)); /* noisy moves */
+  p *= 4.000; /** zoom */
   float granitos = mix(0.034, 0.032, rand(p)); /** subtle nois */
     
   zell = paint(AZUR, VIOLET);
