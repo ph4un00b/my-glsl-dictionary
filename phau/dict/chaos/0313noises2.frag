@@ -1,6 +1,3 @@
-// Author: phau
-// Title: noises 2!
-
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -668,6 +665,14 @@ float fbm1(vec2 x) {
 	}
 	return v;
 }
+
+float patterns(float x) {
+    float test = x;
+    test *= 3.896;
+    test += u_time;
+	test = fract(test);
+    return test;
+}
 void main(void){
 
   vec3 color = vec3(0.);
@@ -694,32 +699,40 @@ void main(void){
   vec2 cube = sub*sub*(3.-2.*sub); // optional
 
   vec2 off = vec2(0.,1.);
-    
+  float test = 0.0;
   p.x = p.x + u_time;
     
   zell = paint(AZUR, VIOLET);
-  zell = vec3(value_noise_linear(p));
+  test = patterns( value_noise_linear(p) );
+  zell = vec3(test);
     color = i.x == 1. && i.y == 1. ? zell : color;
   zell = paint(AZUR, ACQUA);
-  zell = vec3(value_noise(p));
+  test = patterns( value_noise(p) );
+  zell = vec3(test);
     color = i.x == 2. && i.y == 1. ? zell : color;
   zell = paint(AZUR, PURPLE);
-  zell = vec3(perlin_noise(p));
+  test = patterns( perlin_noise(p) );
+  zell = vec3(test);
     color = i.x == 3. && i.y == 1. ? zell : color;
   zell = paint(LIME, ORANGE);
-  zell = vec3(perlin_noise_linear(p));
+  test = patterns( perlin_noise_linear(p) );
+  zell = vec3(test);
     color = i.x == 1. && i.y == 2. ? zell : color;
   zell = paint(AZUR, BLUE);
-  zell = vec3(worley_noise(p));
+  test = patterns( worley_noise(p) );
+  zell = vec3(test);
     color = i.x == 2. && i.y == 2. ? zell : color;
   zell = paint(LIME, ACQUA);
-  zell = vec3(voronoi_noise(p));
+  test = patterns( voronoi_noise(p) );
+  zell = vec3(test);
     color = i.x == 3. && i.y == 2. ? zell : color;
   zell = RED + AZUR;
-  zell = vec3(fbm(p));
+  test = patterns( fbm(p) );
+  zell = vec3(test);
     color = i.x == 1. && i.y == 3. ? zell : color;
   zell = paint(AZUR, VIOLET );
-  zell = vec3(fbm1(p));
+  test = patterns( fbm1(p) );
+  zell = vec3(test);
     color = i.x == 2. && i.y == 3. ? zell : color;
     zell = LIME + AZUR;
     color = i.x == 3. && i.y == 3. ? zell : color;
