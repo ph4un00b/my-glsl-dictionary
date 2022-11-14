@@ -666,16 +666,29 @@ float fbm1(vec2 x) {
 	return v;
 }
 
-float patterns(float x) {
+float patterns(float x, float nois) {
     float test = x;
     test *= 2.672;
-    test += (u_time * 0.412);
+    test += nois;
+    test += (u_time * 0.112);
 	test = fract(test);
     // test = step(0.180, test);
     // test = smoothstep(0.0, 0.124, test);
     test = smoothstep(0.0, 0.124, test) - smoothstep(0.050, 0.172, test);
     return test;
 }
+
+/** @link https://github.com/dmnsgn/glsl-rotate/blob/main/rotation-2d.glsl */
+mat2 rotation2d(float angle) {
+  float s = sin(angle);
+  float c = cos(angle);
+
+  return mat2(
+    c, -s,
+    s, c
+  );
+}
+
 void main(void){
 
   vec3 color = vec3(0.);
@@ -689,7 +702,7 @@ void main(void){
   color.g = fract(st.x);
   color.b = fract(st.y);
 
-  vec2 p = st * 3.008;
+  vec2 p = st * 3.008; 
   vec3 zell = vec3(0.);
 	
   vec2 i = ceil(p);  // integer
@@ -703,42 +716,46 @@ void main(void){
 
   vec2 off = vec2(0.,1.);
   float test = 0.0;
-  p.x = p.x + u_time * 0.2;
+  //p.x = p.x + u_time * 0.2; /* linear movement */
+  // p = p + vec2(u_time * 0.1, u_time * 0.1); /* linear movement */
+  p = p * rotation2d(u_time * 0.005); 
   p *= 1.232; /** zoom */
+  float granitos = mix(0.034, 0.032, rand(p)); /** subtle nois */
     
   zell = paint(AZUR, VIOLET);
-  test = patterns( value_noise_linear(p) );
+  test = patterns( value_noise_linear(p), granitos );
   zell = vec3(mix(c1, c2,test));
     color = i.x == 1. && i.y == 1. ? zell : color;
   zell = paint(AZUR, ACQUA);
-  test = patterns( value_noise(p) );
+  test = patterns( value_noise(p), granitos );
   zell = vec3(test);
     color = i.x == 2. && i.y == 1. ? zell : color;
   zell = paint(AZUR, PURPLE);
-  test = patterns( perlin_noise(p) );
+  test = patterns( perlin_noise(p), granitos );
   zell = vec3(test);
     color = i.x == 3. && i.y == 1. ? zell : color;
   zell = paint(LIME, ORANGE);
-  test = patterns( perlin_noise_linear(p) );
+  test = patterns( perlin_noise_linear(p), granitos );
   zell = vec3(test);
     color = i.x == 1. && i.y == 2. ? zell : color;
   zell = paint(AZUR, BLUE);
-  test = patterns( worley_noise(p) );
+  test = patterns( worley_noise(p), granitos );
   zell = vec3(test);
     color = i.x == 2. && i.y == 2. ? zell : color;
   zell = paint(LIME, ACQUA);
-  test = patterns( voronoi_noise(p) );
+  test = patterns( voronoi_noise(p), granitos );
   zell = vec3(test);
     color = i.x == 3. && i.y == 2. ? zell : color;
   zell = RED + AZUR;
-  test = patterns( fbm(p) );
+  test = patterns( fbm(p), granitos );
   zell = vec3(test);
     color = i.x == 1. && i.y == 3. ? zell : color;
   zell = paint(AZUR, VIOLET );
-  test = patterns( fbm1(p) );
+
+  test = patterns( fbm1(p), granitos );
   zell = vec3(mix(c1, c2,test));
     color = i.x == 2. && i.y == 3. ? zell : color;
-    zell = LIME + AZUR;
+    zell = AZUR;
     color = i.x == 3. && i.y == 3. ? zell : color;
 
   gl_FragColor = vec4(color,1.0);;
