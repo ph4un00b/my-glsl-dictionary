@@ -713,14 +713,31 @@ mat2 rotation2d(float angle) {
   );
 }
 
+
+vec3 hsv2rgb(vec3 c) {
+  /* @link https://github.com/hughsk/glsl-hsv2rgb/blob/master/index.glsl */
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+ 
 void main(void){
 
   vec3 color = vec3(0.);
   vec2 px=1./u_resolution;
   vec2 st=gl_FragCoord.xy*px;
 
-  vec4 c2 = vec4(AZUR, 1.);
-  vec4 c1 = vec4(WHITE, 1.);
+  float hue = noise1x(u_time * .052);
+    
+  float saturation = 1.0;
+  float light = 1.0;
+  vec3 hsl_1 = vec3(hue, saturation, light);
+  vec3 hsl_2 = vec3(hue + 0.5, saturation + -0.408, light + 0.016);
+    
+  vec3 rgb_1 = vec3(hsv2rgb(hsl_1));
+  vec3 rgb_2 = vec3(hsv2rgb(hsl_2));
+  vec4 c2 = vec4(rgb_2, 1.);
+  vec4 c1 = vec4(rgb_1, 1.);
 
   color.r = abs(sin(u_time));
   color.g = fract(st.x);
@@ -732,6 +749,8 @@ void main(void){
   vec2 i = ceil(p);  // integer
   vec2 f = fract(p);  // fraction
     
+
+  // ==========================================
   // round
   vec2 cell = floor(p);
   // value noise - https://www.getrevue.co/profile/xordev/issues/gm-shaders-mini-noise-1437243
@@ -749,38 +768,38 @@ void main(void){
     
   zell = paint(AZUR, VIOLET);
   test = patterns( value_noise_linear(p), granitos );
-  zell = vec3(mix(c1, c2,test));
+  zell = vec3(mix(c2, c1,test));
     color = i.x == 1. && i.y == 1. ? zell : color;
   zell = paint(AZUR, ACQUA);
   test = patterns( value_noise(p), granitos );
-  zell = vec3(test);
+  zell = vec3(mix(c1, c2,test));
     color = i.x == 2. && i.y == 1. ? zell : color;
   zell = paint(AZUR, PURPLE);
   test = patterns( perlin_noise(p), granitos );
-  zell = vec3(test);
+  zell = vec3(mix(c2, c1,test));
     color = i.x == 3. && i.y == 1. ? zell : color;
   zell = paint(LIME, ORANGE);
   test = patterns( perlin_noise_linear(p), granitos );
-  zell = vec3(test);
+  zell = vec3(mix(c1, c2,test));
     color = i.x == 1. && i.y == 2. ? zell : color;
   zell = paint(AZUR, BLUE);
   test = patterns( worley_noise(p), granitos );
-  zell = vec3(test);
+  zell = vec3(mix(c2, c1,test));
     color = i.x == 2. && i.y == 2. ? zell : color;
   zell = paint(LIME, ACQUA);
   test = patterns( voronoi_noise(p), granitos );
-  zell = vec3(test);
+  zell = vec3(mix(c1, c2,test));
     color = i.x == 3. && i.y == 2. ? zell : color;
   zell = RED + AZUR;
   test = patterns( fbm(p), granitos );
-  zell = vec3(test);
+  zell = vec3(mix(c2, c1,test));
     color = i.x == 1. && i.y == 3. ? zell : color;
   zell = paint(AZUR, VIOLET );
 
   test = patterns( fbm1(p), granitos );
   zell = vec3(mix(c1, c2,test));
     color = i.x == 2. && i.y == 3. ? zell : color;
-    zell = AZUR;
+  zell = vec3(mix(c2, c1,0.));
     color = i.x == 3. && i.y == 3. ? zell : color;
 
   gl_FragColor = vec4(color,1.0);;
